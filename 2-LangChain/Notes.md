@@ -4,3 +4,6 @@ a higher number makes the responses more creative, a lower one makes them more d
 - max token: limits the total number of tokens in the response, controlling how long the output can be.
 - timeout: the max time to wait for a response from the model before cancelling their request
 - max retries: the max amount of times to retry a request if that request fails.
+### Issues with agent systems 
+#### Latency
+The agent will be running with response times of seconds, even minutes, unlike software systems with response times in milliseconds.
