@@ -7,3 +7,6 @@ a higher number makes the responses more creative, a lower one makes them more d
 ### Issues with agent systems 
 #### Latency
 The agent will be running with response times of seconds, even minutes, unlike software systems with response times in milliseconds.
+- One way to conduce the perceived latency of the system is by streaming tokens to the user as they appear, rather than printing the answer all at once.
+### Customize the performance of a chat model - system prompts
+You can provide 
