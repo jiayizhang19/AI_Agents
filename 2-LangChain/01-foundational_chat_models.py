@@ -56,11 +56,14 @@ scifi_agent = create_agent(
     model=model,
     system_prompt=system_prompt
 )
+# Enable streaming by using agent.stream(). If instead using agent.invoke(), you will get the full answer at once.
+# flush=True only makes the streamed output visible immediately and smoothly in the terminal, instead of showing chunks.
 for token, metadata in scifi_agent.stream(
     {"messages": [HumanMessage(content="What's the captical of the Moon?")]},
     stream_mode="messages"
 ):
     if token.content:
+        # flush=True forces python to immediately write to the screen rather than buffering output before displaying.
         print(token.content[0]["text"], end="", flush=True)
 
 # ================================================================ #
