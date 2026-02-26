@@ -10,3 +10,4 @@
     - 010 Foundational Models
     - 020 Tools
     - 030 Short-Term Memory
+    - 040 Multimodal Messages
