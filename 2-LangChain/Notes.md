@@ -13,7 +13,7 @@ a higher number makes the responses more creative, a lower one makes them more d
     |Tool wrapper, converts the function into a Tool object|Direct execution|
 ### Issues with Agent Systems - Latency
 The agent will be running with response times of seconds, even minutes, unlike software systems with response times in milliseconds.
-- One way to conduce the perceived latency of the system is by streaming tokens to the user as they appear, rather than printing the answer all at once.
+- One way to conduce the perceived latency of the system is by **streaming tokens** to the user as they appear, rather than printing the answer all at once.
 ### Customize the Performance of a Chat Model - System Prompts
 You can provide any description of the agent and output structure in the system prompt.
 ### Tracing Your Agent - LangSmith
@@ -22,3 +22,8 @@ A tool to visualize:
 - Latency
 - Token usage
 - ...
+### Short-Term Memory - Maintain memory over the length of the conversation
+LangChain is tracking messages in something called the state - the memeory of the agent.
+- checkpointer: Save a snapshot of the state at the end of each run, and then groups.
+### Multimodal Messages
+Encode image and audio files in Base 64
