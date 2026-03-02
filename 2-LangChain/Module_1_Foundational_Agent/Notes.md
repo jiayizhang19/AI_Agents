@@ -1,5 +1,5 @@
 ## Foundational Models
-### Terminologies
+### Parameters
 - temperature: control the randomness of the model's output.
 a higher number makes the responses more creative, a lower one makes them more deterministic.
 - max token: limits the total number of tokens in the response, controlling how long the output can be.

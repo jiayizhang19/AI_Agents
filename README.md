@@ -7,7 +7,11 @@
 - [LangSmith API Key](https://smith.langchain.com/o/68694dd2-79b4-4388-9c07-2c9cf4ec7c03/settings/apikeys): AI Agent tracing
 ### Modules 
 - Foundational Agent
-    - 010 Foundational Models
-    - 020 Tools
-    - 030 Short-Term Memory
-    - 040 Multimodal Messages
+    - Foundational Models
+    - Tools
+    - Short-Term Memory
+    - Multimodal Messages
+- Advanced Agent
+    - Model Context Protocol (MCP)
+    - Context and State
+    - Multi-Agent Systems
