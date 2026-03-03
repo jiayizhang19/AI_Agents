@@ -5,12 +5,13 @@ from langchain.agents import create_agent
 from langchain.messages import HumanMessage
 from pprint import pprint
 
+
 client = MultiServerMCPClient(
     {
         "local_server": {
             "transport": "stdio",
-            # "command": "python",
-            "command": r"d:\program_envs\ai_agents\Scripts\python.exe",
+            "command": "python",
+            # "command": r"d:\program_envs\ai_agents\Scripts\python.exe",
             "args": ["mcp_server_local.py"],
         }
     }
@@ -36,7 +37,7 @@ async def build_agent():
 
 async def run_agent(agent):
     config = {"configurable": {"thread_id": "1"}}
-    response = agent.invoke(
+    response = agent.ainvoke(
         {"messages": [HumanMessage(content="Tell me about the langchain-mcp-adapters library")]},
         config=config
     )    
