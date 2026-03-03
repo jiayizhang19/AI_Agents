@@ -7,4 +7,5 @@ There's a huge open source community of MCP servers that other people have built
     - stdio: communicatation over standard in and standard out
     - streamable_http
 ### Context and State
+The context isn't passed to the model directly. Instead, it's passed to an object called **tool runtime**, which contains the information that the model has access to
 ### Multi-Agent Systems
