@@ -35,5 +35,8 @@ The context isn't passed to the model directly. Instead, it's passed to an objec
 def function(runtime: ToolRuntime) -> str:
     return runtime.context.xxx
 ```
-# It is actively inspected and used at runtime
+
 ### Multi-Agent Systems
+To break down the complex application into multiple specialized agents that work together to solve the problem, rather than a singular agent to handle every step.  
+- Supervisor sub-agent model
+    ![Multi-Agent](../../resources/Multi-Agent.png)
