@@ -6,6 +6,7 @@ There's a huge open source community of MCP servers that other people have built
 - Transport Mechanisms ([Official Documents](https://modelcontextprotocol.io/docs/learn/architecture))
     - stdio: communicatation over standard in and standard out
     - streamable_http
+    
 ### [Context](https://docs.langchain.com/oss/python/langchain/context-engineering#state-3) and State
 - Differences between context_schema, system prompt and RAG system:
     - Context Schema:

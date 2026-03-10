@@ -8,6 +8,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 import asyncio
 
 # MCP available https://mcp.so/server/kiwi-travel-mcp/Vytautas%20Dargis
+# Other MCPs: https://glama.ai/mcp/connectors
 
 load_dotenv()
 model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
