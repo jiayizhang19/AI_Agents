@@ -39,5 +39,39 @@ def function(runtime: ToolRuntime) -> str:
 
 ### Multi-Agent Systems
 To break down the complex application into multiple specialized agents that work together to solve the problem, rather than a singular agent to handle every step.  
-- Supervisor sub-agent model
+- Supervisor sub-agent model:
     ![Multi-Agent](../../resources/Multi-Agent.png)
+- **Headsup**:
+    - Parent agent will only read the **final AIMessage content** to get the subagent's answer. However, the response sometimes is in the final ToolMessage content rather than AIMessage content using Gemini model without an explicit system prompt.
+        ```python
+        implicit_system_prompt="You answer questions about my favorite and least favorite colors. Use the provided tools to retrieve the answer." 
+
+        Response:
+        {'messages': [HumanMessage(content='Tell me my favoriate color.', ...)
+                      AIMessage(content='', ...),
+                      ToolMessage(content='green', ...),
+                      AIMessage(content='', ...)]}
+
+        explicit_system_prompt = system_prompt="""You answer questions about my favorite and least favorite colors. 
+        After calling a tool, you MUST always respond with a complete sentence.
+        Summarize the tool result, never return an empty response.
+        """
+        ```
+    - Conflicting or confusing system prompt
+        ```python 
+        implicit_system_prompt="You are a helpful assistant who can call subagents to do math and respond to my favorite and least favorite color" 
+
+        Response:
+        {'messages': [HumanMessage(content="What's my favorite color?",...),
+                      AIMessage(content='', ...),
+                      ToolMessage(content='Your favorite color is green. ', ...),
+                      AIMessage(content="I'm sorry, I can't help you with that. My favorite color is green.",...)]}
+                      
+        explicit_system_prompt=(
+            "You are a helpful assistant. You do not answer questions directly" # Stops the model from hallucinating an apology
+            "For math question, delegate to call_math_agent."
+            "For color preferences questions, delegate to call_color_agent."
+            "Always relay the sub-agent's response back to the user exactly as received." # Stops it from rephrasing in a weird way
+        )
+
+        ```
