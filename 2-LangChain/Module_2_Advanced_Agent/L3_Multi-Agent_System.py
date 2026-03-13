@@ -8,7 +8,9 @@ from langchain.messages import HumanMessage
 load_dotenv()
 model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
 
-
+# ================================================== #
+# ================== Create Tools ================== #
+# ================================================== #
 @tool
 def square_root(x: float) -> float:
     """Calculate the square root of a number"""
@@ -29,6 +31,10 @@ def least_fav_color() -> str:
     """Return my least favorite color is black"""
     return "black"
 
+
+# ================================================== #
+# ================ Create Subagents ================ #
+# ================================================== #
 math_agent = create_agent(
     model=model,
     tools=[square, square_root]
@@ -55,6 +61,10 @@ color_agent = create_agent(
     """
 )
 
+# ================================================== #
+# =============== Create Coordinator =============== #
+# ================================================== #
+
 @tool
 def call_math_agent(query: str) -> str:
     """Call math agent to perform a calculation described in the query."""
@@ -72,7 +82,6 @@ def call_color_agent(query: str) -> str:
     )
     return response["messages"][-1].content
 
-
 """
 Clarify the system prompt, telling the main agent it should delegate to sub-agents, not answer directly.
 Example of conflicting response:
@@ -85,7 +94,6 @@ system_prompt="You are a helpful assistant who can call subagents to do math and
 
 """
 
-
 main_agent = create_agent(
     model=model,
     tools=[call_math_agent, call_color_agent],
@@ -97,6 +105,10 @@ main_agent = create_agent(
     )
 )
 
+
+# ================================================== #
+# =============== Multi-agent system =============== #
+# ================================================== #
 cal_question = HumanMessage(content="What is the square of 4.0")
 info_question = HumanMessage(content="What's my least favorite color?")
 other_question = HumanMessage(content="What's my favoriate food?")

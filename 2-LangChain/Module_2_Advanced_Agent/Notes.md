@@ -6,8 +6,68 @@ There's a huge open source community of MCP servers that other people have built
 - Transport Mechanisms ([Official Documents](https://modelcontextprotocol.io/docs/learn/architecture))
     - stdio: communicatation over standard in and standard out
     - streamable_http
+- Differences between MCP tools V.S. regular tools
+    - Regular tools are plain python functions, they exist immediately when the interpreter runs the @tool line.
+    - MCP tools must be fethched over a network connection from the MCP server. You can't get them until you **await** the async HTTP call. Which means, everything that depends on MCP tools must live **inside async def**
+        - The MCP tools are already in a list format, no need to wrap tool in a list. While regular tools must manually be wrapped into a list.
+        ```python
+        # ======= MCP tools and agent call ===== #
+        flight_client = MultiServerMCPClient(
+        {
+            "travel_server":{
+                "url": "https://mcp.kiwi.com",
+                "transport": "streamable_http"
+            }
+        }
+        )
+        async def travel_agent(): # must be async 
+            tools = await flight_client.get_tools()
+            travel_agent = create_agent(
+                model=model,
+                tools = tools,
+                system_prompt="""..."""
+            ) 
+            return travel_agent
+
+        async def run_travel_agent(): # must be async
+            agent = await travel_agent()
+            response = agent.ainvoke(
+                {
+                    "messages": HumanMessage(content="...")
+                }
+            )
+            return response
+        
+        coordinator = create_agent( # sync 
+        model=model,
+        tools=[search_flights, search_venues, suggest_playlist, update_state],
+        state_schema=WeddingState,
+        system_prompt=""" ... """
+        )
+
+        async def call_coordinator(): # must be async
+            response = await coordinator.ainvoke(
+                {
+                    "messages": HumanMessage(content=query)
+                }
+            )
+            pprint(response["messages"][-1].content)
+
+        asyncio.run(call_coordinator())
+
+        # ======= Regular tools and agent call ======== #
+        @tool
+        def web_search():
+            pass
+        web_agent = create_agent(
+            model=model,
+            tools=[web_search],
+            system_prompt="""..."
+        )
+        ```
     
 ### [Context](https://docs.langchain.com/oss/python/langchain/context-engineering#state-3) and State
+#### Context
 - Differences between context_schema, system prompt and RAG system:
     - Context Schema:
         - A context schema is a structured runtime state outside the LLM, it is a **system state**, not knowledge.
@@ -37,10 +97,45 @@ def function(runtime: ToolRuntime) -> str:
     return runtime.context.xxx
 ```
 
+#### State
+It is **dynamic data** that **changes** as the agent runs, updated using *Command(update={})* and accessed via *runtime.state["key"]*. While the context is **static read-only data** injected at invocation time, accessed via *runtime.context["key"]*.
+```python
+from langchain.agents import AgentState
+from langgraph.types import Command
+from langchain.tools import tool, ToolRuntime
+
+class WeddingState(AgentState):
+    origin: str
+    destination: str
+
+@tool
+def update_state(origin: str, destination: str, runtime: ToolRuntime) -> str:
+    """
+    Update the state when you know all the values: origin, destination
+    """
+    return Command[tuple[()]](  # can be simplified to Command(update={})
+        update={
+            "origin": origin,
+            "destination": destination,
+            "messages": [ToolMessage(
+                content="Successfully updated state",
+                tool_call_id=runtime.tool_call_id
+            )]
+        }
+    )
+```
+
+
 ### Multi-Agent Systems
 To break down the complex application into multiple specialized agents that work together to solve the problem, rather than a singular agent to handle every step.  
 - Supervisor sub-agent model:
     ![Multi-Agent](../../resources/Multi-Agent.png)
+    - Flows: 
+        - Single tool --> 
+        - Create and wrap to cooresponding sub-agent --> 
+        - Write tools to invoke each sub-agent --> 
+        - Create and wrap tools to main coordinator agent --> 
+        - Invoke the main agent.
 - **Headsup**:
     - Parent agent will only read the **final AIMessage content** to get the subagent's answer. However, the response sometimes is in the final ToolMessage content rather than AIMessage content using Gemini model without an explicit system prompt.
         ```python
