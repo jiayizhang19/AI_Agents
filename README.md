@@ -22,3 +22,10 @@
     - [Context and State](2-LangChain/Module_2_Advanced_Agent/L2_context.py) 
     - [Multi-Agent Systems](2-LangChain/Module_2_Advanced_Agent/L3_Multi-Agent_System.py)
     - Project: [Wedding Planner](2-LangChain/Module_2_Advanced_Agent/L4_wedding_planner.py)
+- Production-Ready Agent
+    - Notes
+    - Middleare
+    - Managing Long Conversations
+    - Human In The Loop
+    - Dynamic Agents
+    - Project: Email Assistant + Agent Chat UI
