@@ -20,3 +20,11 @@ Moving from maintaining **short conversations with checkpointer** to **long conv
 
 The **checkpointer** is like a **database** - it saves and loads **the full unmodified history**.  -- Solves persistence.
 Middleware only affects what the LLM sees in that moment - it doesn't permanently delete from the checkpointer's storage, unless using RemoveMessage which does permanently delete. --> Solves overflow.
+
+### Human In The Loop
+- Approving sensitive actions
+    - Approve
+    - Reject
+    - Edit: Edit then approve the editted version immediately.
+- Adding missing context
+- Debugging agents
