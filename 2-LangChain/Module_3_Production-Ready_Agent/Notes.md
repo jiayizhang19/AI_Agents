@@ -18,7 +18,7 @@ Moving from maintaining **short conversations with checkpointer** to **long conv
     - @before_agent / @ after_agent: run **once** per run
     - @before_model / @ after_model: run **multiple times** per run  
 
-The **checkpointer** is like a **database** - it saves and loads **the full unmodified history**.  -- Solves persistence.
+The **checkpointer** is like a **database** - it saves and loads **the full unmodified history**.  --> Solves persistence.
 Middleware only affects what the LLM sees in that moment - it doesn't permanently delete from the checkpointer's storage, unless using RemoveMessage which does permanently delete. --> Solves overflow.
 
 ### Human In The Loop
@@ -26,5 +26,45 @@ Middleware only affects what the LLM sees in that moment - it doesn't permanentl
     - Approve
     - Reject
     - Edit: Edit then approve the editted version immediately.
+        ```python 
+        from langchain.agents.middleware import HumanInTheLoopMiddleware
+        agent = create_agent(
+            model=model,
+            tools=[read_email, send_email],
+            checkpointer=InMemorySaver(),
+            state_schema=EmailState,
+            middleware=[
+                HumanInTheLoopMiddleware[AgentState, None](
+                    interrupt_on={
+                        "read_email": False, # Choose which tools require human in the loop approval
+                        "send_email": True
+                    },
+                    description_prefix="Send email tool execution requires approval."
+                )
+            ],
+            system_prompt="You are an email assistant. Always delegate tasks to read_emial then send_email." \
+            "You are not allowed to ask followup questions when invoke read_email tool."
+        )
+        ```
 - Adding missing context
 - Debugging agents
+
+### Dynamic Agents
+Change prompts, tools and even models.
+#### Dynamic Prompts
+- ```@dynamic_prompt```  
+Use ```@dynamic_prompt``` to tell the agent instead of a fixed system prompt string, runs this function before each LLM call to generate the prompt dynamically. Without this ```@dynamic_prompt```, system prompt is fixed forever at agent creation.  
+Without this decorator, even the context is passed and stored, nothing reads it, the system prompt still remains unchanged.
+- ```request:ModelRequest```  
+In a ```@dynamic_prompt``` function, use ```request.runtime.context.xxx``` as it is inside a middleware function that runs before the LLM call. While if inside a ```@tool```, use ```runtime.context.xxx``` directly.
+    ```python 
+    from langchain.agents.middleware import dynamic_prompt, ModelRequest
+    @dataclass
+    class LanguageContext:
+        user_language: str = "English"
+    @dynamic_prompt
+    def user_language_prompt(request: ModelRequest) -> str:
+        """Generate system prompt based on user role."""
+        user_language = request.runtime.context.user_language
+    ```
+

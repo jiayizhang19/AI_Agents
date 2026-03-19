@@ -67,20 +67,12 @@ There's a huge open source community of MCP servers that other people have built
         ```
     
 ### [Context](https://docs.langchain.com/oss/python/langchain/context-engineering#state-3) and State
+|Context|State|
+|---|---|
+|Changed by **the developer** at each .invoke() call.| Changed by **the agent** itself|
+|Lives inside "configurable" dict in config|Lives inside "AgentState" class.|
+
 #### Context
-- Differences between context_schema, system prompt and RAG system:
-    - Context Schema:
-        - A context schema is a structured runtime state outside the LLM, it is a **system state**, not knowledge.
-        - It is deterministic, structured and hidden from the model.
-        - It is server-side session variables (backend session object), It is useful for business logic, e.g. permissions, config, IDs.
-    - System Prompt:
-        - Inside the prompt sent to the LLM, intended for model reasoning and instructions.
-        - It is unstructured, soft gudiance (LLM may forget / ignore), prone to interpretation / hallucination.
-        - It is not useful for business logic, only for prompting style.
-    - RAG system:
-        - It is external knowledge that the LLM can read and reason over, RAG content goes into the prompt.
-        - It is textual, unstructured, visible to LLM.
-        - It is searchable knowledge base.
 - Create Context Schema:
 Use @dataclass to create your context schema. It is a clean way to define structured data without writing an __init__. While it is mandatory to use @dataclass for context schema, you could also use a plain class or even a dict.
 ```python 
@@ -96,9 +88,25 @@ The context isn't passed to the model directly. Instead, it's passed to an objec
 def function(runtime: ToolRuntime) -> str:
     return runtime.context.xxx
 ```
+- Differences between context_schema, system prompt and RAG system:
+    - Context Schema:
+        - A context schema is a structured runtime state outside the LLM, it is a **system state**, not knowledge.
+        - It is deterministic, structured and hidden from the model.
+        - It is server-side session variables (backend session object), It is useful for business logic, e.g. permissions, config, IDs.
+    - System Prompt:
+        - Inside the prompt sent to the LLM, intended for model reasoning and instructions.
+        - It is unstructured, soft gudiance (LLM may forget / ignore), prone to interpretation / hallucination.
+        - It is not useful for business logic, only for prompting style.
+    - RAG system:
+        - It is external knowledge that the LLM can read and reason over, RAG content goes into the prompt.
+        - It is textual, unstructured, visible to LLM.
+        - It is searchable knowledge base.
+
+
 
 #### State
-It is **dynamic data** that **changes** as the agent runs, updated using *Command(update={})* and accessed via *runtime.state["key"]*. While the context is **static read-only data** injected at invocation time, accessed via *runtime.context["key"]*.
+It is **dynamic data** that **changes** as the agent runs, updated using *Command(update={})* and accessed via *runtime.state["key"]*.
+While the context is **static read-only data** injected at invocation time, accessed via *runtime.context["key"]*.
 ```python
 from langchain.agents import AgentState
 from langgraph.types import Command
