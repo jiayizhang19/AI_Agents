@@ -1,5 +1,5 @@
-## Advanced Agent
-### MCP (Model Context Protocol)
+# Advanced Agent
+## 1. MCP (Model Context Protocol)
 An open protocol that standardizes how your LLM applications connect to and work with your/others' tools and data sources. Think it as a USB cable, that can connect any speakers or mics or any other devices to your computer.
 ![MCP](../../resources/MCP.png)
 There's a huge open source community of MCP servers that other people have built which we can easily insert into our agent and other types of AI applications.
@@ -66,13 +66,13 @@ There's a huge open source community of MCP servers that other people have built
         )
         ```
     
-### [Context](https://docs.langchain.com/oss/python/langchain/context-engineering#state-3) and State
+## 2. [Context](https://docs.langchain.com/oss/python/langchain/context-engineering#state-3) and State
 |Context|State|
 |---|---|
 |Changed by **the developer** at each .invoke() call.| Changed by **the agent** itself|
 |Lives inside "configurable" dict in config|Lives inside "AgentState" class.|
 
-#### Context
+### 2.1 Context
 - Create Context Schema:
 Use @dataclass to create your context schema. It is a clean way to define structured data without writing an __init__. While it is mandatory to use @dataclass for context schema, you could also use a plain class or even a dict.
 ```python 
@@ -89,11 +89,11 @@ def function(runtime: ToolRuntime) -> str:
     return runtime.context.xxx
 ```
 - Differences between context_schema, system prompt and RAG system:
-    - Context Schema:
+    - Context Schema - a ToolRuntime read is needed:
         - A context schema is a structured runtime state outside the LLM, it is a **system state**, not knowledge.
         - It is deterministic, structured and hidden from the model.
         - It is server-side session variables (backend session object), It is useful for business logic, e.g. permissions, config, IDs.
-    - System Prompt:
+    - System Prompt - no ToolRuntime read is necessary:
         - Inside the prompt sent to the LLM, intended for model reasoning and instructions.
         - It is unstructured, soft gudiance (LLM may forget / ignore), prone to interpretation / hallucination.
         - It is not useful for business logic, only for prompting style.
@@ -103,8 +103,8 @@ def function(runtime: ToolRuntime) -> str:
         - It is searchable knowledge base.
 
 
-
-#### State
+### 2.2 State
+The above **context** is immutable, meaning the **agent can't actually update or change it itself**. State is used to keep track of the historical messages with the help of check pointer. Make a custom state to keep track of anything else. Unlike with context, we might not include default values during the class creation. 
 It is **dynamic data** that **changes** as the agent runs, updated using *Command(update={})* and accessed via *runtime.state["key"]*.
 While the context is **static read-only data** injected at invocation time, accessed via *runtime.context["key"]*.
 ```python
@@ -133,8 +133,19 @@ def update_state(origin: str, destination: str, runtime: ToolRuntime) -> str:
     )
 ```
 
+### 2.3 ToolRuntime Read
+**A ToolRuntime read is needed** when the information **lives outside the model**, such as:
+1. Conversation/app state 
+2. User profile or preferences in storage3
+3. Database/API data
+4. Fresh or private knowledge not in pretraining  
 
-### Multi-Agent Systems
+The model itself has two different “knowledge channels” where ToolRuntime read is not needed:
+1. Parametric knowledge: This is what was learned during training and baked into weights. You do not need a runtime tool to access it.
+2. In-context knowledge: This is what you put into the prompt/history at runtime. Also no special tool is needed if it is already in context.
+
+
+## 3. Multi-Agent Systems
 To break down the complex application into multiple specialized agents that work together to solve the problem, rather than a singular agent to handle every step.  
 - Supervisor sub-agent model:
     ![Multi-Agent](../../resources/Multi-Agent.png)
