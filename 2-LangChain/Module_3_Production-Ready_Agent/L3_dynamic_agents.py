@@ -19,7 +19,9 @@ class LanguageContext:
 def user_language_prompt(request: ModelRequest) -> str:
     """Generate system prompt based on user role."""
     user_language = request.runtime.context.user_language
-    base_prompt = "You are a helpful assistant."
+    # First Prompt: telling the agent to respond in English
+    base_prompt = "You are a helpful assistant." 
+    # Second Prompt: telling it to respond in whatever language is in the context
     if user_language != "English":
         return f"{base_prompt} only respond in {user_language}."
     elif user_language == "English":

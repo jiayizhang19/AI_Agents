@@ -50,7 +50,9 @@ Middleware only affects what the LLM sees in that moment - it doesn't permanentl
 - Debugging agents
 
 ### Dynamic Agents
-Change prompts, tools and even models.
+Unlike the above **node-style middleware** like trimming messages, which is inserted into agent's runtime by hooking it before or after either the model or agent was invoked. This **wrap style middleware** is to hook into the model instance itself. It isn't before or after the model, this is the model, for instance, change prompts, tools and even the model.
+- Model Request: The model instance is represented as a model request, including the system prompt, available tool calls, the state and the foundational model itself. So if you can grab the model request and adjust that with your function, you're essentially adjusting what the model looks like. 
+![Model Request](../../resources/Model_Request.png)
 #### Dynamic Prompts
 - ```@dynamic_prompt```  
 Use ```@dynamic_prompt``` to tell the agent instead of a fixed system prompt string, runs this function before each LLM call to generate the prompt dynamically. Without this ```@dynamic_prompt```, system prompt is fixed forever at agent creation.  
