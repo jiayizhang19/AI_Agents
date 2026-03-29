@@ -77,7 +77,7 @@ In a ```@dynamic_prompt``` function, use ```request.runtime.context.xxx``` as it
     ```
 
 #### 3.2 Dynamic Tool Calls
-- @wrap_tool_calls  
+- **@wrap_tool_calls** -> must be used with **handler** 
 Wraps each LLM call, you control request and response of the model, you can adjust the tool calls that the model sees, for example, you can add a tool call to the list of available tools, or remove some tools from the list.
     - Use ```request.override()``` to override the model request with a new one rather than directly modifying request because ModelRequest is immutable — it's a clean functional pattern where you create a modified copy rather than changing the original.
         ```python
@@ -107,5 +107,27 @@ Wraps each LLM call, you control request and response of the model, you can adju
                     request = request.override(tools=tools)
                 return handler(request) # must call LLM here, you decide when to call it and with what request
             ```
+#### 3.3 Dynamic Models
+- @wrap_model_call can also be used to swap out the entire model based on the runtime context. For example, you can have a more powerful model for internal users and a cheaper model for external users.
+    ```python
+    from langchain.agents.middleware import ModelRequest, ModelResponse, wrap_model_call
+    from typing import Callable
 
+    @wrap_model_call
+    def dynamic_model_swap(
+        request: ModelRequest,
+        handler: Callable[[ModelRequest], ModelResponse]
+    ) -> ModelResponse:
+        """Dynamically swap models based on the runtime context"""
+        user_role = request.runtime.context.user_role
+        if user_role == "internal":
+            model = ChatOpenAI(model="gpt-4")
+        else:
+            model = ChatOpenAI(model="gpt-3.5-turbo")
+        request = request.override(model=model)
+        return handler(request) # must call LLM here, you decide when to call it and with what request
+    ```
+    
+### 4. Comparation (ModelRequest vs Runtime vs ToolRuntime)
+![ModelRequest vs Runtime vs ToolRuntime](<../../resources/ModelRequest vs Runtime vs ToolRuntime.png>)
 
