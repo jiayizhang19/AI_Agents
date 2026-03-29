@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 from pprint import pprint
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.agents import create_agent
-from langchain.tools import tool
 from langchain.messages import HumanMessage
 from dataclasses import dataclass
 from langchain.agents.middleware import dynamic_prompt, ModelRequest
@@ -10,6 +9,7 @@ from langchain.agents.middleware import dynamic_prompt, ModelRequest
 
 load_dotenv()
 model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+
 
 @dataclass
 class LanguageContext:
@@ -41,3 +41,6 @@ response = agent.invoke(
 )
 
 pprint(response)
+
+
+
