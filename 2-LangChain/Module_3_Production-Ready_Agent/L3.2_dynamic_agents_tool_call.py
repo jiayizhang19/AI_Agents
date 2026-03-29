@@ -47,7 +47,7 @@ def dynamic_tool_call(
     else:
         tools = [web_search]
         request = request.override(tools=tools)
-    return handler(request)
+    return handler(request) # must call LLM here, you decide when to call it and with what request
 
 agent = create_agent(
     model=model,

@@ -36,7 +36,7 @@ agent = create_agent(
 
 
 response = agent.invoke(
-    {"messages": [HumanMessage(content="Hello, how are you?")]},
+    {"messages": [HumanMessage(content="Hello, how are you? Are you an agent or a human?")]},
     context=LanguageContext(user_language="Chinese")
 )
 
